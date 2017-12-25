@@ -12,13 +12,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private EarthView mEarthView;
     private Earth mEarth;
-//    float x = 0;
-//    float x1;
-//    float y = 0;
-//    float y1;
-//
-//    float preX = 0;
-//    float preY = 0;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
