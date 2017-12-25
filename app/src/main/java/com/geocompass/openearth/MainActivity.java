@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.geocompass.openearth.sdk.earth.Earth;
 import com.geocompass.openearth.sdk.earth.EarthView;
+import com.geocompass.openearth.sdk.earth.geometry.LatLng;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -21,15 +22,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mEarthView = findViewById(R.id.earth_view);
 
         mEarth = mEarthView.getEarth();
-
-        findViewById(R.id.btn_rotate_right).setOnClickListener(this);
-        findViewById(R.id.btn_rotate_left).setOnClickListener(this);
-        findViewById(R.id.btn_rotate_up).setOnClickListener(this);
-        findViewById(R.id.btn_rotate_down).setOnClickListener(this);
         findViewById(R.id.btn_zoom_in).setOnClickListener(this);
         findViewById(R.id.btn_zoom_out).setOnClickListener(this);
         findViewById(R.id.btn_look_up).setOnClickListener(this);
         findViewById(R.id.btn_look_down).setOnClickListener(this);
+        findViewById(R.id.btn_set_center).setOnClickListener(this);
 
     }
 
@@ -37,18 +34,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_rotate_right:
-                mEarth.rotateEarth(1, (float) (Math.PI / 72));
-                return;
-            case R.id.btn_rotate_left:
-                mEarth.rotateEarth(1, -(float) (Math.PI / 72));
-                return;
-            case R.id.btn_rotate_up:
-                mEarth.rotateEarth(0, -(float) (Math.PI / 72));
-                return;
-            case R.id.btn_rotate_down:
-                mEarth.rotateEarth(0, (float) (Math.PI / 72));
-                return;
             case R.id.btn_zoom_in:
                 mEarth.zoomIn();
                 return;
@@ -60,6 +45,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return;
             case R.id.btn_look_down:
                 mEarth.lookDown();
+                return;
+            case R.id.btn_set_center:
+                mEarth.setCenter(new LatLng(40,116));
                 return;
         }
     }

@@ -7,45 +7,62 @@
 #define OPENEARTH_EARTH_HPP
 
 #include <glm/matrix.hpp>
+#include "geometry/latlng.hpp"
 
 namespace OpenEarth{
-    static float  const  DEFAULT_RADIUS = 1.0f;
-    static float  const  DEFAULT_SCALE  = 1.0f;
     static int const  TILE_SIZE  = 256;
     class Earth{
+    private:
     public:
+        /**初始化*/
+        static void initialize();
+
+        static void updateModelMatrix();
+
+        /** 获取当前的模型矩阵*/
+        static glm::mat4 getModelMatrix();
+
+        /*** 设置球体半径*/
         static void setRadius(float r);
+        /*** 获取球体半径*/
         static float getRadius();
 
-        static void setScale(float scale);
+        /**
+         * 设置球体缩放比例
+         * @return 如果改变了级别，返回true,否则返回flase
+         */
+        static bool setScale(float scale);
+
+        /*** 获取球体缩放比例*/
         static float getScale();
 
+        static bool  setZoom(int zoom);
+
+        static int getZoom();
 
         /**
-         * 绕X轴转
-         * @param rad
+         * 旋转球体
+         * @param deltaLat  变化的纬度 (degree表示）
+         * @param deltaLon  变化的经度（degree表示）
          */
-        static void rotateX(float rad);
+        static void rotate(float deltaLat, float deltaLon);
 
-        /**
-         * 绕Y轴转
-         * @param rad
-         */
-        static void rotateY(float rad);
-
-        /**
-         * 绕Z轴转
-         * @param rad
-         */
-        static void rotateZ(float rad);
-
-        /**
-         * 沿Z轴上移动球心
-         * @param distance
-         */
+        /*** 沿Z轴上移动球心*/
         static void setTranslateZ(float distance);
 
+        /*** 获取球心的世界坐标*/
         static glm::vec3 getCenter();
+
+        /***设置球心的世界坐标*/
+        static void setCenter(glm::vec3 center);
+
+        /*** 设置当前视图中心的经纬度*/
+        static void   setCenterLatLng(LatLng* latLng);
+
+        /*** 获取当前视图中心的经纬度*/
+        static LatLng* getCenterLatLng();
+
+
     };
 }
 
