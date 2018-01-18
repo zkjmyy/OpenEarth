@@ -7,6 +7,7 @@
 #include "../util/assets_file_reader.hpp"
 #include "earth.hpp"
 #include <GLES2/gl2.h>
+#include <sstream>
 
 extern "C" {
     #include "../util/png_reader.h"
@@ -46,9 +47,8 @@ void OpenEarth::Tile::reset() {
 }
 
 
-void OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation, AAssetManager *amgr,
-                           const char *path) {
-    GLuint textureId = loadTexture(amgr, path);
+
+void OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation,GLuint textureId){
     glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureId);
@@ -67,7 +67,7 @@ void OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation, AAs
         glDrawArrays(GL_TRIANGLE_STRIP, 0, pointCount);
 
     }
-    glDeleteTextures(1, &textureId);  //需要及时清理纹理，否则每次都增加新的纹理到内存中，以后可以考虑使用缓存，不必每次都重新加载纹理
+    glDeleteTextures(1, &textureId);
 }
 
 static float dtor(float d) {
@@ -79,8 +79,13 @@ static float dtor(float d) {
  */
 void OpenEarth::Tile::genVertexArray() {
     float R = OpenEarth::Earth::getRadius();
-    float width = bounds[2] - bounds[0];
+    float width  = bounds[2] - bounds[0];
     float height = bounds[1] - bounds[3];
+
+    if(std::fmod(width,step)>0){
+       step = width / 4;
+    }
+
 
     rows = height / step;
     cols = width / step + 1;
@@ -109,7 +114,6 @@ void OpenEarth::Tile::genVertexArray() {
         index = 0;
         float lon;
         for (lon = bounds[0]; lon <= bounds[2]; lon += step) {
-//            if(lon==bounds[2]) lon = lon - (lon/100000000);
             float lonR1 = dtor(lon);
             x1 = (float) (cosLat1 * sin(lonR1));
             z1 = (float) (cosLat1 * cos(lonR1));
@@ -134,31 +138,14 @@ void OpenEarth::Tile::genVertexArray() {
     }
 }
 
-/**
- * 加载纹理
- */
-GLuint loadTexture(AAssetManager *amgr, const char *path) {
-    FileData fileData = OpenEarth::util::AssetsFileReader::get_asset_data(path, amgr);
-    RawImageData data = get_raw_image_data_from_jpeg(fileData.data, (int) fileData.data_length);
-//        RawImageData data = decompressJpegFromFile("/storage/emulated/0/west.jpeg");
-//        RawImageData data = get_raw_image_data_from_png(fileData.data,(int) fileData.data_length);
 
-    OpenEarth::util::AssetsFileReader::release_asset_data(&fileData);
-    GLuint textureId;
-    glGenTextures(1, &textureId);
-    assert(textureId != 0);
 
-    glBindTexture(GL_TEXTURE_2D, textureId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//超出图片范围，不重复
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(
-            GL_TEXTURE_2D, 0, data.gl_color_format, data.width, data.height, 0,
-            data.gl_color_format, GL_UNSIGNED_BYTE, data.data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    release_raw_image_data(&data);
-    return textureId;
+
+std::string OpenEarth::Tile::genUniqueCode(int zoom,int x,int y){
+    std::stringstream stringStream;
+    stringStream << zoom << "_" << x << "_" << y << std::endl;
+    return stringStream.str();
 }
+
+
 

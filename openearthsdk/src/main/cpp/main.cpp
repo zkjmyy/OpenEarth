@@ -5,9 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "jni.hpp"
 #include "native_earth_view.hpp"
 #include "earth/earth_renderer.hpp"
-
+#include "storage/http_data_source.hpp"
 
 //LoadLibrary后，首先调用该方法
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -21,8 +22,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 
     OpenEarth::NativeEarthView::registerNative(env);
     OpenEarth::EarthRenderer::registerNative(env);
+    OpenEarth::Storage::HttpDataSource::registerNative(env);
 
     result = JNI_VERSION_1_6;
+    jni::setJVM(vm);
     return result;
 }
 
